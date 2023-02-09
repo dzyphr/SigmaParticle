@@ -3,3 +3,6 @@
 
 #ignore all pycache
 *__pycache__/
+
+#ignore all unofficial examples
+chainedTxs/
