@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 def connect():
     load_dotenv()
     node_url = os.getenv('testnetNode') # MainNet or TestNet
-    ergo = appkit.ErgoAppKit(node_url=node_url)
-
+    api_url = os.getenv('apiURL')
+    ergo = appkit.ErgoAppKit(node_url=node_url, api_url=api_url)
+    ak = appkit.ErgoAppKit(node_url, api_url)
     wallet_mnemonic = os.getenv('mnemonic')
     mnemonic_password = os.getenv('mnemonicPass')
     if mnemonic_password != "":
@@ -22,4 +23,4 @@ def connect():
     else:
         #WITHOUT MNEMONIC PASSWORD
         senderAddress = helper_functions.get_wallet_address(ergo=ergo, amount=1, wallet_mnemonic=wallet_mnemonic)
-    return ergo, wallet_mnemonic, mnemonic_password, senderAddress
+    return ergo, wallet_mnemonic, mnemonic_password, senderAddress, ak

@@ -12,5 +12,4 @@ main(os.getenv('ContractName'), ergo, wallet_mnemonic, mnemonic_password, sender
 from cleanup import *
 cleanup()
 
-if __name__ == "__main__":
-    main()
+
