@@ -1,9 +1,12 @@
-import os
 import json
 import logging
-
-from ergpy import helper_functions, appkit
+import os
 from dotenv import load_dotenv
+load_dotenv()
+import sys 
+if bool(os.getenv('localErgpy')) == True:
+    sys.path.insert(0, '../ergpy') #prefer local version
+from ergpy import appkit, helper_functions
 def connect():
     load_dotenv()
     node_url = os.getenv('testnetNode') # MainNet or TestNet
