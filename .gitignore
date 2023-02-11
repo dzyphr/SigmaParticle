@@ -7,3 +7,5 @@
 #ignore all unofficial examples
 chainedTxs/
 
+#ignore whole ergpy folder
+ergpy/

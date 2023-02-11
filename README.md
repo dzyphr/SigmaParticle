@@ -20,16 +20,16 @@
 
  edit the .env with the following parameters:
 
- testnetNode="http://127.0.0.1:9052/" _if you arent running local node change this, whole project only tested with testnet at the moment_
+ `testnetNode="http://127.0.0.1:9052/"` _if you arent running local node change this, whole project only tested with testnet at the moment_
 
- mnemonic="_your mnemonic seed phrase_"
+ `mnemonic="_your mnemonic seed phrase_"`
 
- mnemonicPass="_your mnemonic password_" _IF YOU HAVE ONE! If you have one and don't use this transactions will fail_
+ `mnemonicPass="_your mnemonic password_"` _IF YOU HAVE ONE! If you have one and don't use this transactions will fail_
 
-apiURL="https://tn-ergo-explorer.anetabtc.io/" _explorer API url, feel free to use this one_
+ `apiURL="https://tn-ergo-explorer.anetabtc.io/"` _explorer API url, feel free to use this one_
 
-localErgpy="" _True or false based on if you need functionality that was added into our local Ergpy repository. If false it will attempt to use an installed version from pip_
+ `localErgpy=""` _True or false based on if you need functionality that was added into our local Ergpy repository. If false it will attempt to use an installed version from pip. To keep the repo small we will only ship modifications insead of the whole Ergpy repo_
 
-There is 1 auto-generated variable named `ContractName` which occurs when you run `./new_Frame yourContractNameHere` at the start of the process. You could change this post-build at your own discretion. 
+ There is 1 auto-generated variable named `ContractName` which occurs when you run `./new_Frame yourContractNameHere` at the start of the process. You could change this post-build at your own discretion. 
 
 
