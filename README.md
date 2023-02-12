@@ -6,19 +6,19 @@
 **In Development**
 # Stage: Alpha
 
-#### Framework for working with the Ergo blockchain utilizing the Ergpy module
+## Framework for working with the Ergo blockchain utilizing the Ergpy module
 
 ###### [Ergpy](https://github.com/mgpai22/ergpy)
 
  Uses .env file to modulate several parameters including secrets, based on linux filesystem only at the moment
 
-#### Basic Usage:
+## Basic Usage:
 
 ######  run `./new_Frame yourContractNameHere`
 
 ######  `cd` to the contract folder
 
-###### ** edit the `.env` hidden file with the following parameters: **
+####  edit the `.env` hidden file with the following parameters: 
 
 ######  `testnetNode="http://127.0.0.1:9052/"` _if you arent running local node change this, whole project only tested with testnet at the moment_
 
@@ -32,4 +32,4 @@
 
 ######  There is 1 auto-generated variable named `ContractName` which occurs when you run `./new_Frame yourContractNameHere` at the start of the process. You could change this post-build at your own discretion. 
 
-###### After that is set up, write your contract / transaction in `py/main.py` and deploy with `./deploy.sh`
+#### After that is set up, write your contract / transaction in `py/main.py` and deploy with `./deploy.sh`
