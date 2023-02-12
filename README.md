@@ -16,9 +16,9 @@
 
  run `./new_Frame yourContractNameHere`
 
- cd to the contract folder
+ `cd` to the contract folder
 
- edit the .env with the following parameters:
+ edit the `.env` hidden file with the following parameters:
 
  `testnetNode="http://127.0.0.1:9052/"` _if you arent running local node change this, whole project only tested with testnet at the moment_
 
@@ -28,8 +28,8 @@
 
  `apiURL="https://tn-ergo-explorer.anetabtc.io/"` _explorer API url, feel free to use this one_
 
- `localErgpy=""` _True or false based on if you need functionality that was added into our local Ergpy repository. If false it will attempt to use an installed version from pip. To keep the repo small we will only ship modifications insead of the whole Ergpy repo_
+ `localErgpy=""` _True or false based on if you need functionality that was added into our local Ergpy repository. If false it will attempt to use an installed version from pip. To keep the repo small we will only ship modifications insead of the whole Ergpy repo. If using a modified ergpy repo just place it into the base folder, the same folder where the new_frame binary is_
 
  There is 1 auto-generated variable named `ContractName` which occurs when you run `./new_Frame yourContractNameHere` at the start of the process. You could change this post-build at your own discretion. 
 
-
+ After that is set up, write your contract / transaction in `py/main.py` and deploy with `./deploy.sh`
