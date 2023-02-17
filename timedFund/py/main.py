@@ -29,7 +29,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     #p2 just needs to claim before the deadline (after at least one block confirmation of the timedFundTx) 
     #and doesn't need to update their local instance to sign for the block height..? 
     #that is my interpretation based on debugging and this is open to discussion. 
-    deadline = ergo._ctx.getHeight() + 3
+    deadline = ergo._ctx.getHeight() + 5
     cb = ConstantsBuilder.create()
     timedFundContract = ergo._ctx.compileContract(cb.item("p1", p1).item("p2", p2).item("deadline", deadline).build(), timedFundScript) #must run constantsBuilder.build() in here
     tb = ergo._ctx.newTxBuilder()
@@ -43,7 +43,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     p2WM = ergo.getMnemonic(os.getenv('p2Mnemonic'))
     timedFundTxSignedp1 = ergo._ctx.newProverBuilder().withMnemonic(p1WM[0]).withEip3Secret(senderEIP3Secret).build().sign(timedFundTxp1)
     ergo.txId(timedFundTxSignedp1) #send initial funding tx
-    p2Withdraws = bool(random.getrandbits(1)) #random bool
+    p2Withdraws =True# bool(random.getrandbits(1)) #random bool
     if p2Withdraws == True:
         p2ErgoTree = ErgoTreeContract(ergo.castAddress(p2Address).getErgoAddress().script(), ergo._networkType)
         p2WithdrawBox = tb.outBoxBuilder().value(depositAmount * Parameters.OneErg - Parameters.MinFee).contract(p2ErgoTree).build()
@@ -55,15 +55,15 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
         )
         p2WM = ergo.getMnemonic(os.getenv('p2Mnemonic'))
         p2WithdrawTxSigned =  ergo._ctx.newProverBuilder().withMnemonic(p2WM[0]).withEip3Secret(p2EIP3Secret).build().sign(p2WithdrawTx)
-        waits.waitForBlockHeight(ergo, ergo._ctx.getHeight() + 1) #wait for ~one block
+        waits.waitForBlockHeight(ergo, ergo._ctx.getHeight()) #wait for ~one block
         print("\np2 attempting to withdraw\n") #if the deadline is one block and you wait one block this will fail
-        ergo.txId(p2WithdrawTxSigned)
-        
+        ergo._ctx.sendTransaction(p2WithdrawTxSigned)
     else:
         waits.waitForBlockHeight(ergo, deadline) #waits for deadline + mod
         node_url = os.getenv('testnetNode') # MainNet or TestNet
         api_url = os.getenv('apiURL')
         ergo = appkit.ErgoAppKit(node_url=node_url, api_url=api_url)
+        ergo._ctx
         p1ErgoTree = ErgoTreeContract(ergo.castAddress(senderAddress[0]).getErgoAddress().script(), ergo._networkType)
         p1WithdrawBox =  tb.outBoxBuilder().value(depositAmount * Parameters.OneErg - Parameters.MinFee).contract(p1ErgoTree).build()
         timedOutputsToSpend = timedFundTxSignedp1.getOutputsToSpend(index_for_outbox=0)

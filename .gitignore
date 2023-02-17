@@ -1,6 +1,12 @@
 # ignore all .env files
 *.env
 
+# ignore scala .class files
+*.class
+
+# ignore all vim swap files
+*.swp
+
 #ignore all pycache
 *__pycache__/
 
