@@ -15,7 +15,6 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     print("Running", contractName)
     pinLockScript = "sigmaProp(INPUTS(0).R4[Coll[Byte]].get == blake2b256(OUTPUTS(0).R4[Coll[Byte]].get))"
     pinLockContract = ergo.compile_proxy_contract(pinLockScript)
-    userParty = senderAddress
     rawPin = "9728"
     hasher = hashlib.blake2b(digest_size=32)
     hasher.update(bytes(rawPin, 'utf-8'))
