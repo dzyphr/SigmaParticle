@@ -4,8 +4,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 import sys 
+print(os.getenv('localErgpy'))
 if bool(os.getenv('localErgpy')) == True:
-    sys.path.insert(0, '../ergpy') #prefer local version
+    sys.path.insert(0, '../ergpy/ergpy/') #prefer local version
 from ergpy import appkit, helper_functions
 def connect():
     load_dotenv()
