@@ -24,7 +24,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     p2Address = os.getenv('p2Address')
     p2 = Address.create(p2Address).getPublicKey() #nautilus testnet addr 2
     depositAmount = 10
-    timedFundScript = "sigmaProp(p1 && HEIGHT > deadline || p2 && HEIGHT <= deadline)" 
+    timedFundScript = "p1 && sigmaProp(HEIGHT > deadline) || p2 && sigmaProp(HEIGHT <= deadline)" 
     #this script requires p1 to get a new instance of the appkit inorder for them to publish a valid signature when claiming 
     #p2 just needs to claim before the deadline (after at least one block confirmation of the timedFundTx) 
     #and doesn't need to update their local instance to sign for the block height..? 
