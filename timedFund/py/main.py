@@ -43,7 +43,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     p2WM = ergo.getMnemonic(os.getenv('p2Mnemonic'))
     timedFundTxSignedp1 = ergo._ctx.newProverBuilder().withMnemonic(p1WM[0]).withEip3Secret(senderEIP3Secret).build().sign(timedFundTxp1)
     ergo.txId(timedFundTxSignedp1) #send initial funding tx
-    p2Withdraws =True# bool(random.getrandbits(1)) #random bool
+    p2Withdraws =  bool(random.getrandbits(1)) #random bool
     if p2Withdraws == True:
         p2ErgoTree = ErgoTreeContract(ergo.castAddress(p2Address).getErgoAddress().script(), ergo._networkType)
         p2WithdrawBox = tb.outBoxBuilder().value(depositAmount * Parameters.OneErg - Parameters.MinFee).contract(p2ErgoTree).build()
