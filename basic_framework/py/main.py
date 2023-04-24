@@ -10,5 +10,5 @@ from ergpy import helper_functions, appkit
 import waits
 import coinSelection
 import scalaPipe
-def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
+def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, args):
     print("Running", contractName)

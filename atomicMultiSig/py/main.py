@@ -8,6 +8,7 @@ import choice
 import jpype
 from jpype import *
 import java.lang
+from sigmastate.interpreter.CryptoConstants import dlogGroup
 from org.ergoplatform.appkit import *
 from org.ergoplatform.appkit.impl import *
 from ergpy import helper_functions, appkit
@@ -43,11 +44,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     minPreImage = pow(2, 64) #give a lower bound to prevent accidental small blinding value pre-images that could be quickly brute forced
     maxPreImage = pow(2, 256) #upper bound for preimage blinding value 
     randPreImage = random.randrange(minPreImage, maxPreImage) #here is our scalar random blinding value the most important part 
-    # the pre image now has some random blinding factor however it also should commit to the specific message to prevent reuse
-    # this turns it into a deterministic blinding factor / preimage which reduces the chance of collision attacks or reuse
-    # add this to the message: current blockheight, timestamp, value, scriptWith pubkey variables replaced with public keys hex
-    # and the lockHeight variable replaced with exact lockHeight as integer
-    # the messaging protocol will probably be slimmed down to save verification byte size
+    
     currentBlockHeight = ergo._ctx.getHeight()
     currentHeightHex = hex(currentBlockHeight)[2:]
     time_stamp = datetime.datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
@@ -58,15 +55,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
     messageScriptHex = messageScript.encode('utf-8').hex()
     publicMessage = currentHeightHex + time_stamp_hex + valuehex + messageScriptHex
     preImage = publicMessage + hex(randPreImage)[2:] #now we have a collision resistant value which includes a large scalar random
-                                                #this seems to be suitable for an atomic swap hash pre-image
-    #now finally we can hash our preImage #technically we can zero knowledge our preImage by getting a ~256-512 bit hash of it
-                                            #and then use that hash as the preimage it self since it will be just as deterministic
-                                            #that being said all the values we use are public so it is not clear if this is useful
-
-    #roughly 2095 bit preImage which should absolutely be collision resistant, 
-    #an likely be shrunk but wont be until further notice
-    #its not inherently important for receiver to verify the message used as the determinism in the preimage, but it can be done
-    #simply increasing the range for the scalar random will increase the security of the setup
+                                                
     hasher = hashlib.blake2b(digest_size=32)
     hasher.update(bytes(preImage, 'utf-8'))
     hashedPreImage =  hasher.digest()
@@ -118,9 +107,10 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress):
         senderWithdrawBox = tb.outBoxBuilder() \
             .value(depositAmount * Parameters.OneErg - Parameters.MinFee) \
             .registers(
-            [
-                ErgoValue.of(hashedPreImage) #provide the hash as alt path for sender re-claiming un swapped coins
-            ]).contract(senderErgoTree).build()
+                [
+                    ErgoValue.of(hashedPreImage) #provide the hash as alt path for sender re-claiming un swapped coins
+                ]
+            ).contract(senderErgoTree).build()
         atomicOutputsToSpend = senderAtomicLockTxSigned.getOutputsToSpend(index_for_outbox=0)
         coinSelection.pruneToIndex(0, atomicOutputsToSpend)
         senderWithdrawTx = ergo.buildUnsignedTransaction(

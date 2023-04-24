@@ -12,6 +12,8 @@
 
 #ignore all unofficial examples
 chainedTxs/
+SwapKeyManager
+
 
 #ignore whole ergpy folder
 ergpy/
