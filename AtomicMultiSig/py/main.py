@@ -11,6 +11,8 @@ import waits
 import coinSelection
 import scalaPipe
 from sigmastate.interpreter.CryptoConstants import *
+import java.math.BigInteger
+import scala.math.BigInt as BigInt
 from java.math import BigInteger
 interpreterClasspath = \
     "/home/" + os.getlogin() + "/Downloads/sigmastate-interpreter-5.0.7/target/scala-2.12/sigma-state_2.12-HEAD-20230423-1639.jar"
@@ -75,17 +77,16 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
                 ConstantsBuilder.create()\
                 .item("receiver", receiver.getPublicKey())\
                 .item("sender", senderPubkey)\
-                .item("srG", srG)\
-                .item("ssG", ssG)\
-                .item("krG", krG)\
-                .item("ksG", ksG)\
+                .item("srG", GE_srG)\
+                .item("ssG", GE_ssG)\
+                .item("krG", GE_krG)\
+                .item("ksG", GE_ksG)\
                 .item("generator", ECC_Generator)\
                 .item("lockHeight", lockHeight)\
                 .build(),
                 atomicLockScript)
         inputBoxes =  ergo.getInputBox(sender_address=castedSender, amount_list=[ergoAmountRaw], tokenList=None)
-        tb = ergo._ctx.newTxBuilder()
-        AtomicBox = tb.outBoxBuilder() \
+        AtomicBox = ergo._ctx.newTxBuilder().outBoxBuilder() \
             .value(ergoAmountFeeIncluded) \
             .contract(AtomicContract)\
             .build()
@@ -99,7 +100,45 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         print(signedTxJSON)
 
     def atomicReceiverClaim():
-        print("stuff")
+        receiver = Address.create(os.getenv('receiverAddr'))
+        castedReceiver =  ergo.castAddress(os.getenv('receiverAddr'))
+        receiverEIP3 = int(os.getenv('receiverEIP3Secret'))
+        receiverMnemonic = ergo.getMnemonic(SecretString.create(os.getenv('receiverMnemonic')), \
+                mnemonic_password=SecretString.create(os.getenv('receiverMnemonicPass')))
+        receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverMnemonic[0]).withEip3Secret(receiverEIP3).build()
+        atomicBoxID = os.getenv('atomicBox')
+        ergoAmountFeeSubtracted = Parameters.OneErg * 10 - Parameters.MinFee
+        krGX = BigInteger(os.getenv('krGX'))
+        krGY = BigInteger(os.getenv('krGY'))
+        krG = ecPointToGroupElement(dlogGroup().curve().createPoint(krGX, krGY))
+        ev_krG = ErgoValue.of(krG)
+        ksGX = BigInteger(os.getenv('ksGX'))
+        ksGY = BigInteger(os.getenv('ksGY'))
+        ksG = ecPointToGroupElement(dlogGroup().curve().createPoint(ksGX, ksGY))
+        ev_ksG = ErgoValue.of(ksG)
+        sr = BigInteger(os.getenv('sr'))
+        sr_array =  BigInt.javaBigInteger2bigInt(sr).toByteArray()
+        ev_sr_array = ErgoValue.of(sr_array)
+        ss = BigInteger(os.getenv('ss'))
+        ss_array =  BigInt.javaBigInteger2bigInt(ss).toByteArray()
+        ev_ss_array = ErgoValue.of(ss_array)
+        receiverErgoTree = ErgoTreeContract(castedReceiver.getErgoAddress().script(), ergo._networkType)
+        unlockBox = ergo._ctx.newTxBuilder().outBoxBuilder() \
+            .value(ergoAmountFeeSubtracted) \
+            .contract(receiverErgoTree)\
+            .registers([ev_sr_array, ev_ss_array, ev_krG, ev_ksG])\
+            .build()
+        inputBoxes = java.util.Arrays.asList(ergo._ctx.getBoxesById(atomicBoxID))
+        unsignedTx = ergo.buildUnsignedTransaction(\
+            input_box = inputBoxes, outBox=[unlockBox],\
+            sender_address=castedReceiver\
+        )
+        signedTx = receiverProver.sign(unsignedTx)
+        print(ergo.txId(signedTx)) #CLAIM
+        signedTxJSON = senderProver.sign(unsignedTx).toJson(True)
+        print(signedTxJSON)
+
+
 
         
 
@@ -111,8 +150,10 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
     if len(args) > 1:
         if args[1] == "deposit":
             atomicDeposit()
+        elif args[1] == "receiverClaim":
+            atomicReceiverClaim()
         else:
-            print("unknown arg.\nchoices: deposit")
+            print("unknown arg.\nchoices: deposit, receiverClaim")
     else:
-        print("enter argument.\nchoices: deposit")
+        print("enter argument.\nchoices: deposit, receiverClaim")
 
