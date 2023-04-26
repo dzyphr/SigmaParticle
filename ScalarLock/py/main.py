@@ -32,12 +32,23 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         ergoAmountFeeIncluded = ergoAmount + Parameters.MinFee
         ECC_Generator = dlogGroup().generator().getEncoded(True)
         x = BigInteger(os.getenv('x'))
-        xG = dlogGroup().generator().multiply(x)
+#        xG = dlogGroup().generator().multiply(x) #this one will work implicitly because of direct DLogMult
+        xGX = BigInteger(os.getenv('xGX')) #grabbing xG from X and Y Coords will only work if external 'prover' produces proper pubkey
+        xGY = BigInteger(os.getenv('xGY')) 
+        xG = dlogGroup().curve().createPoint(xGX, xGY)
+        
+        receiver = os.getenv('receiverAddr')
+        receiverPubkey = Address.create(receiver).getPublicKey()
+        castedReceiver = ergo.castAddress(receiver)
+
+
         ScalarLockScript = \
         "\
             {\
             val xBYTES = OUTPUTS(0).R4[Coll[Byte]].get;\
             val x = byteArrayToBigInt(xBYTES);\
+            val yBYTES = OUTPUTS(0).R4[Coll[Byte]].get;\
+            val y = byteArrayToBigInt(yBYTES);\
             val G = decodePoint(generator);\
               sigmaProp(\
                 receiver &&\
@@ -47,8 +58,9 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         "
         ScalarContract = ergo._ctx.compileContract( \
                 ConstantsBuilder.create()\
-                .item("receiver", senderPubkey)\
+                .item("receiver", receiverPubkey)#senderPubkey)\
                 .item("xG", xG)\
+                .item("yG", xG)\
                 .item("generator", ECC_Generator)\
                 .build(),
                 ScalarLockScript)
@@ -67,12 +79,22 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         print(signedTxJSON)
 
     def receiverClaim():
-        sender = senderAddress[0] #sender is receiver for example
+        '''
+        sender = senderAddress[0] #sender is receiver for this form of example
         receiver = Address.create(sender).getPublicKey()
         castedReceiver =  ergo.castAddress(sender)
         receiverEIP3 = int(os.getenv('senderEIP3Secret'))
         receiverMnemonic = ergo.getMnemonic(wallet_mnemonic, mnemonic_password=mnemonic_password)
         receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverMnemonic[0]).withEip3Secret(receiverEIP3).build()
+        '''
+        
+        receiver = os.getenv('receiverAddr') #use this form of example when receiver is actual receiver
+        receiverPubkey = Address.create(receiver).getPublicKey()
+        castedReceiver = ergo.castAddress(receiver)
+        receiverEIP3 = int(os.getenv('receiverEIP3Secret'))
+        receiverMnemonic = ergo.getMnemonic(os.getenv('receiverMnemonic'), mnemonic_password=os.getenv('receiverMnemonicPass'))
+        receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverMnemonic[0]).withEip3Secret(receiverEIP3).build()
+
         scalarBoxID = os.getenv('scalarBox')
         ergoAmount = Parameters.OneErg * 10
         ergoAmountFeeSubtracted = ergoAmount - Parameters.MinFee
@@ -84,7 +106,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         unlockBox = ergo._ctx.newTxBuilder().outBoxBuilder() \
             .value(ergoAmountFeeSubtracted) \
             .contract(receiverErgoTree)\
-            .registers([ev_xBYTES])\
+            .registers([ev_xBYTES, ev_xBYTES])\
             .build() 
         inputBoxes = java.util.Arrays.asList(ergo._ctx.getBoxesById(scalarBoxID)) 
         unsignedTx = ergo.buildUnsignedTransaction(\
