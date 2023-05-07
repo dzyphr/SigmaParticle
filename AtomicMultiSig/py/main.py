@@ -11,7 +11,6 @@ import waits
 import coinSelection
 import scalaPipe
 from sigmastate.interpreter.CryptoConstants import *
-import java.math.BigInteger
 import scala.math.BigInt as BigInt
 from java.math import BigInteger
 interpreterClasspath = \
@@ -27,9 +26,9 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         senderWalletMnemonic = ergo.getMnemonic(wallet_mnemonic, mnemonic_password=mnemonic_password)
         senderEIP3Secret = int(os.getenv('senderEIP3Secret'))
         senderProver = ergo._ctx.newProverBuilder().withMnemonic(senderWalletMnemonic[0]).withEip3Secret(senderEIP3Secret).build()
-        ergoAmountRaw = 10
+        ergoAmountRaw = int(os.getenv('ergoAmount'))
         ergoAmount = ergoAmountRaw * Parameters.OneErg#should be automated irl
-        ergoAmountFeeIncluded = ergoAmount + Parameters.MinFee
+        ergoAmountFeeIncluded = ergoAmount #+ Parameters.MinFee #fee seems to include itself
         ECC_Generator = dlogGroup().generator().getEncoded(True)
 
         #Public Key Points for coordinating / proof of nonces specific to swap
