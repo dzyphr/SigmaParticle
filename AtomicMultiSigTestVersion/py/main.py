@@ -98,12 +98,12 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         print(signedTxJSON)
 
     def atomicReceiverClaim():
-        receiver = senderAddress[0]
-        castedReceiver = ergo.castAddress(senderAddress[0])
-        receiverPubkey = Address.create(receiver).getPublicKey()
-        receiverWalletMnemonic = ergo.getMnemonic(wallet_mnemonic, mnemonic_password=mnemonic_password)
-        receiverEIP3Secret = int(os.getenv('senderEIP3Secret'))
-        receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverWalletMnemonic[0]).withEip3Secret(receiverEIP3Secret).build()
+        receiver = Address.create(os.getenv('receiverAddr'))
+        castedReceiver =  ergo.castAddress(os.getenv('receiverAddr'))
+        receiverEIP3 = int(os.getenv('receiverEIP3Secret'))
+        receiverMnemonic = ergo.getMnemonic(os.getenv('receiverMnemonic'), \
+                mnemonic_password=os.getenv('receiverMnemonicPass'))
+        receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverMnemonic[0]).withEip3Secret(receiverEIP3).build()
         atomicBoxID = os.getenv('atomicBox')
         ergoAmountFeeSubtracted = Parameters.OneErg * 10 - Parameters.MinFee
         krGX = BigInteger(os.getenv('krGX'))
