@@ -1,3 +1,4 @@
+import sys
 import os
 import time
 import random
@@ -14,7 +15,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
  
     def boxVal(boxId):
         inputBox = java.util.Arrays.asList(ergo._ctx.getBoxesById(boxId)) 
-        print(inputBox[0].getValue())
+        sys.stdout.write(str(inputBox[0].getValue()))
 
     if len(args) > 1:
         boxVal(args[1])
