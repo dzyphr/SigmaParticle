@@ -105,7 +105,8 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         receiverEIP3Secret = int(os.getenv('senderEIP3Secret'))
         receiverProver = ergo._ctx.newProverBuilder().withMnemonic(receiverWalletMnemonic[0]).withEip3Secret(receiverEIP3Secret).build()
         atomicBoxID = os.getenv('atomicBox')
-        ergoAmountFeeSubtracted = Parameters.OneErg * 10 - Parameters.MinFee
+        ergoAmountRaw = int(os.getenv('ergoAmount'))
+        ergoAmountFeeSubtracted = Parameters.OneErg * ergoAmountRaw - Parameters.MinFee
         krGX = BigInteger(os.getenv('krGX'))
         krGY = BigInteger(os.getenv('krGY'))
         krG = ecPointToGroupElement(dlogGroup().curve().createPoint(krGX, krGY))
@@ -145,7 +146,8 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
         senderProver = ergo._ctx.newProverBuilder().withMnemonic(senderWalletMnemonic[0]).withEip3Secret(senderEIP3Secret).build()
         senderErgoTree = ErgoTreeContract(castedSender.getErgoAddress().script(), ergo._networkType)
         atomicBoxID = os.getenv('atomicBox')
-        ergoAmountFeeSubtracted = Parameters.OneErg * 10 - Parameters.MinFee
+        ergoAmountRaw = int(os.getenv('ergoAmount'))
+        ergoAmountFeeSubtracted = Parameters.OneErg * ergoAmountRaw - Parameters.MinFee
         refundBox = ergo._ctx.newTxBuilder().outBoxBuilder() \
             .value(ergoAmountFeeSubtracted) \
             .contract(senderErgoTree)\
