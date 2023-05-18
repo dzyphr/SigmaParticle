@@ -25,6 +25,7 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
             f.write(str(value))
             f.close()
 
+
     if len(args) > 1:
         if len(args) > 2:
             boxVal(args[1], args[2])
