@@ -14,9 +14,25 @@ import scalaPipe
 def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, args):
  
     def boxOwner(boxId, filepath=None):
-        inputBox = java.util.Arrays.asList(ergo._ctx.getBoxesById(boxId))
-        tree = ErgoTreeContract(inputBox[0].getErgoTree(),  ergo._networkType)
-        print(tree.toAddress())
+        if filepath == None:
+            inputBox = java.util.Arrays.asList(ergo._ctx.getBoxesById(boxId))
+            tree = ErgoTreeContract(inputBox[0].getErgoTree(),  ergo._networkType)
+            print(tree.toAddress())
+        else:
+            f = open(filepath, "w")
+            f.write(
+                str(
+                    ErgoTreeContract(\
+                        java.util.Arrays.asList(\
+                            ergo._ctx.getBoxesById(\
+                                boxId\
+                            )\
+                        )[0].getErgoTree(), \
+                        ergo._networkType
+                    ).toAddress()\
+                )\
+            )
+            f.close()
 
     if len(args) > 1:
         if len(args) > 2:
