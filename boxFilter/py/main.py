@@ -36,7 +36,6 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
             if tx["outputs"][0]["boxId"] != boxId:
                 newBoxes.append(tx["outputs"][0]["boxId"])
                 newTxs.append(tx)
-        NoneType = type(None)
         ext = "_tx"
         i = 1
         for tx in newTxs:
