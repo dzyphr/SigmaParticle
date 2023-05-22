@@ -83,6 +83,11 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
                 .item("lockHeight", lockHeight)\
                 .build(),
                 atomicLockScript)
+        ergoTree = AtomicContract.getErgoTree().bytesHex()
+        f = open("ergoTree", "w")
+        f.write(str(ergoTree))
+        f.close()
+
         inputBoxes =  ergo.getInputBox(sender_address=castedSender, amount_list=[ergoAmountRaw], tokenList=None)
         AtomicBox = ergo._ctx.newTxBuilder().outBoxBuilder() \
             .value(ergoAmountFeeIncluded) \
