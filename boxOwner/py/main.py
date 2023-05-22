@@ -19,20 +19,29 @@ def main(contractName, ergo, wallet_mnemonic, mnemonic_password, senderAddress, 
             tree = ErgoTreeContract(inputBox[0].getErgoTree(),  ergo._networkType)
             print(tree.toAddress())
         else:
+            four_o_four = \
+                "\"error\" : 404"
             f = open(filepath, "w")
-            f.write(
-                str(
-                    ErgoTreeContract(\
-                        java.util.Arrays.asList(\
-                            ergo._ctx.getBoxesById(\
-                                boxId\
-                            )\
-                        )[0].getErgoTree(), \
-                        ergo._networkType
-                    ).toAddress()\
-                )\
-            )
-            f.close()
+            try:
+                response = ErgoTreeContract(\
+                            java.util.Arrays.asList(\
+                                ergo._ctx.getBoxesById(\
+                                    boxId\
+                                )\
+                            )[0].getErgoTree(), \
+                            ergo._networkType
+                        ).toAddress()
+            except:
+                f.close()
+                os.remove(filepath)
+                exit()
+            if four_o_four in str(response):
+                f.close()
+                os.remove(filepath)
+                exit()
+            else:
+                f.write(str(response))
+                f.close()
 
     if len(args) > 1:
         if len(args) > 2:
